@@ -3,17 +3,21 @@ package com.github.rillig.intellij.pluralinspection;
 import com.intellij.codeInsight.daemon.GroupNames;
 import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.codeInspection.ui.ListTable;
+import com.intellij.codeInspection.ui.ListWrappingTableModel;
 import com.intellij.psi.*;
+import com.intellij.util.containers.OrderedSet;
+import com.siyeh.ig.ui.UiUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public class PluralCollectionNamesInspection extends BaseJavaLocalInspectionTool {
 
-    private static final Set<String> COLL_CLASSES = new HashSet<>(Arrays.asList(
+    public OrderedSet<String> collectionTypes = new OrderedSet<>(Arrays.asList(
             "java.util.Collection",
             "java.util.List",
             "java.util.Map",
@@ -47,6 +51,13 @@ public class PluralCollectionNamesInspection extends BaseJavaLocalInspectionTool
         return "PluralCollectionNames";
     }
 
+    @Nullable
+    @Override
+    public JComponent createOptionsPanel() {
+        ListTable table = new ListTable(new ListWrappingTableModel(collectionTypes, "Collection types"));
+        return UiUtils.createAddRemoveTreeClassChooserPanel(table, "Choose collection type");
+    }
+
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
@@ -59,17 +70,17 @@ public class PluralCollectionNamesInspection extends BaseJavaLocalInspectionTool
         };
     }
 
-    private static void checkPlural(PsiIdentifier name, PsiType type, @NotNull ProblemsHolder holder) {
+    private void checkPlural(PsiIdentifier name, PsiType type, @NotNull ProblemsHolder holder) {
         String strName = name.getText();
         if (strName != null && !strName.endsWith("s") && isCollection(type))
             holder.registerProblem(name, "Collection variable name should be plural");
     }
 
-    private static boolean isCollection(PsiType type) {
+    private boolean isCollection(PsiType type) {
         if (!(type instanceof PsiClassType))
             return false;
 
         String className = type.getCanonicalText().replaceFirst("<.*", "");
-        return COLL_CLASSES.contains(className);
+        return collectionTypes.contains(className);
     }
 }
