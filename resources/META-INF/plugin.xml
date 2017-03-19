@@ -1,0 +1,22 @@
+<idea-plugin>
+  <id>de.roland_illig.intellij.pluralinspection</id>
+  <name>Checks plural forms of collection variable names</name>
+  <version>1.0</version>
+  <vendor email="roland.illig@gmx.de" url="https://github.com/rillig/intellij-pluralinspection">Roland Illig</vendor>
+
+  <description><![CDATA[
+      Checks that variables of collection types have names that indicate plural.
+  ]]></description>
+
+  <change-notes><![CDATA[]]>
+  </change-notes>
+
+  <idea-version since-build="161.0"/>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <inspectionToolProvider implementation="com.github.rillig.intellij.pluralinspection.InspectionsProvider"/>
+  </extensions>
+
+  <actions/>
+
+</idea-plugin>
