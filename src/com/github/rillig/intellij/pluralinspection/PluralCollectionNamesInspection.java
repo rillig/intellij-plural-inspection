@@ -8,6 +8,7 @@ import com.intellij.codeInspection.ui.ListWrappingTableModel;
 import com.intellij.psi.*;
 import com.intellij.util.containers.OrderedSet;
 import com.siyeh.ig.ui.UiUtils;
+import java.util.Locale;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,8 +73,16 @@ public class PluralCollectionNamesInspection extends BaseJavaLocalInspectionTool
 
     private void checkPlural(PsiIdentifier name, PsiType type, @NotNull ProblemsHolder holder) {
         String strName = name.getText();
-        if (strName != null && !strName.endsWith("s") && isCollection(type))
+        if (strName != null && !isPluralName(strName) && isCollection(type))
             holder.registerProblem(name, "Collection variable name should be plural");
+    }
+
+    private boolean isPluralName(String name) {
+        String lcname = name.toLowerCase(Locale.ROOT);
+        return lcname.endsWith("s")
+                || lcname.endsWith("list")
+                || lcname.endsWith("set")
+                || lcname.endsWith("map");
     }
 
     private boolean isCollection(PsiType type) {
